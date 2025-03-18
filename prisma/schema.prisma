@@ -39,7 +39,7 @@ model Otp {
   @@map("otps")
 }
 
-model Foods {
+model Food {
   id          String   @id @default(auto()) @map("_id") @db.ObjectId
   name        String
   description String
