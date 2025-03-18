@@ -28,10 +28,7 @@ const upload = multer({ storage: s3Storage });
 
 // Single image uploads
 const uploadProfileImage = upload.single("profileImage");
-const uploadFoodImages = upload.array("foodImage");
-// const uploadPackageImage = upload.single("packageImage");
-// const uploadServiceImage = upload.single("serviceImage");
-// const uploadPortifiloImage = upload.single("portifolioImage");
+const uploadFoodImages = upload.single("foodImage");
 
 // Multiple image uploads
 
@@ -39,7 +36,4 @@ export const fileUploader = {
   upload,
   uploadProfileImage,
   uploadFoodImages
-  // uploadPackageImage,
-  // uploadServiceImage,
-  // uploadPortifiloImage,
 };

@@ -25,26 +25,24 @@ const createUserIntoDB = async (payload: User) => {
         data: {
             ...payload,
             password: newPass,
-            status : "ACTIVE"
+            status: "ACTIVE"
         },
         select: {
             id: true,
             name: true,
             email: true,
             role: true,
-            status : true,
+            status: true,
             createdAt: true,
             updatedAt: true
         }
     })
-
     // OTPFn(payload.email)
-
     return result
 }
 
 
-const passwordChangeIntoDB = async ( payload: any, token: string) => {
+const passwordChangeIntoDB = async (payload: any, token: string) => {
 
     const userInfo = token && jwt.decode(token) as { id: string, email: string }
 
@@ -70,5 +68,27 @@ const passwordChangeIntoDB = async ( payload: any, token: string) => {
     return result
 }
 
+const updateUserIntoDB = async (id: string, payload: any, image: any) => {
 
-export const userServices = { createUserIntoDB, passwordChangeIntoDB }
+    const userImage = image?.location
+
+    try {
+        const update = await prisma.user.update({
+            where: {
+                id
+            },
+            data: {
+                ...payload,
+                image: userImage ?? undefined
+            }
+        })
+
+        return update
+
+    } catch (error) {
+        throw new ApiError(StatusCodes.BAD_REQUEST, "User not found")
+    }
+}
+
+
+export const userServices = { createUserIntoDB, passwordChangeIntoDB, updateUserIntoDB }

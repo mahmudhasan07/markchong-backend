@@ -3,9 +3,11 @@ import ApiError from "../../error/ApiErrors";
 import { StatusCodes } from "http-status-codes";
 import { prisma } from "../../../utils/prisma";
 
-const createFoodIntoDB = async (payload: Food, image : any) => {
+const createFoodIntoDB = async (payload: Food, image: any) => {
 
-    const foodImage = image[0].filename
+    const foodImage = image.location
+    console.log(foodImage);
+    
 
     const result = await prisma.food.create({
         data: {
@@ -22,7 +24,7 @@ const getAllFoodsFromDB = async () => {
     const result = await prisma.food.findMany({})
 }
 
-const getSingleFoodFromDB = async (id : string) => {
+const getSingleFoodFromDB = async (id: string) => {
     const result = await prisma.food.findUnique({
         where: {
             id
@@ -30,7 +32,7 @@ const getSingleFoodFromDB = async (id : string) => {
     })
 }
 
-const deleteFoodFromDB = async (id : string) => {
+const deleteFoodFromDB = async (id: string) => {
     const result = await prisma.food.delete({
         where: {
             id
@@ -39,30 +41,26 @@ const deleteFoodFromDB = async (id : string) => {
 }
 
 
-const updateFoodIntoDB = async (id : string, payload: any, images : any) => {
+const updateFoodIntoDB = async (id: string, payload: any, image: any) => {
 
-    const foodImage = images[0].filename
+    const foodImage = image.filename
 
-    const findFood = await prisma.food.findUnique({
-        where: {
-            id
-        }
-    })
+    try {
+        const result = await prisma.food.update({
+            where: {
+                id
+            },
+            data: {
+                ...payload,
+                image: foodImage ?? undefined
+            }
+        })
 
-    if (!findFood) {
-        throw new ApiError(StatusCodes.NOT_FOUND, "Food not found")
+        return result
+    } catch (error) {
+        throw new ApiError(StatusCodes.BAD_REQUEST, "Food not found")
     }
-    const result = await prisma.food.update({
-        where: {
-            id
-        },
-        data: {
-            ...payload,
-            image : foodImage || (findFood && findFood?.image)
-        }
-    })
 
-   return result
 
 }
 

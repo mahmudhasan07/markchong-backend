@@ -82,7 +82,7 @@ model Order {
 model Notifications {
   id         String   @id @default(auto()) @map("_id") @db.ObjectId
   senderId   String   @db.ObjectId
-  receiverId String   @db.ObjectId 
+  receiverId String   @db.ObjectId
   title      String
   body       String
   read       Boolean  @default(false)

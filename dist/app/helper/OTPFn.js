@@ -1,28 +1,34 @@
-import nodemailer from 'nodemailer';
-import crypto from 'crypto';
-import { PrismaClient } from '@prisma/client';
-import ApiError from '../error/ApiErrors';
-import { StatusCodes } from 'http-status-codes';
+"use strict";
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.OTPFn = void 0;
+const nodemailer_1 = __importDefault(require("nodemailer"));
+const client_1 = require("@prisma/client");
 // import { myCache } from '../app';
-const prisma = new PrismaClient();
-
+const prisma = new client_1.PrismaClient();
 const OTP_EXPIRY_TIME = 5 * 60 * 1000; // OTP valid for 5 minutes
 const expiry = new Date(Date.now() + OTP_EXPIRY_TIME);
-
-export const OTPFn = async (email: string) => {
-
+const OTPFn = (email) => __awaiter(void 0, void 0, void 0, function* () {
     const otp = Math.floor(100000 + Math.random() * 900000);
-
-
     // console.log(`OTP for ${email} is ${otp}`);
-    const transporter = nodemailer.createTransport({
+    const transporter = nodemailer_1.default.createTransport({
         service: 'gmail', // Use your email service provider
         auth: {
             user: 'mahmudhasan.hb@gmail.com', // Your email address
             pass: process.env.MAIL_PASS // Your email password
         }
     });
-
     // Set up email data
     const mailOptions = {
         from: '"EcomGrove" <mahmudhasan.hb@gmail.com>', // Sender address
@@ -42,13 +48,10 @@ export const OTPFn = async (email: string) => {
                 <p style="font-size: 16px; color: #555;">The EcomGrove Team</p>
             </div>` // HTML body
     };
-
     // Send mail with defined transport object
-    await transporter.sendMail(mailOptions);
+    yield transporter.sendMail(mailOptions);
     // myCache.set(email, otp);
-
-
-    const updateOTP = await prisma.otp.upsert({
+    const updateOTP = yield prisma.otp.upsert({
         where: {
             email: email
         },
@@ -61,11 +64,7 @@ export const OTPFn = async (email: string) => {
             otp: otp,
             expiry: expiry
         }
-    })
-
-   
-
-    return updateOTP
-
-
-}
+    });
+    return updateOTP;
+});
+exports.OTPFn = OTPFn;
