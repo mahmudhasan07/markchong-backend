@@ -2,12 +2,11 @@ import { Food, PrismaClient } from "@prisma/client";
 import ApiError from "../../error/ApiErrors";
 import { StatusCodes } from "http-status-codes";
 import { prisma } from "../../../utils/prisma";
+import { deleteFile } from "../../helper/deleteFile";
 
 const createFoodIntoDB = async (payload: Food, image: any) => {
 
-    const foodImage = image.location
-    console.log(foodImage);
-    
+    const foodImage = image?.location
 
     const result = await prisma.food.create({
         data: {
@@ -17,11 +16,13 @@ const createFoodIntoDB = async (payload: Food, image: any) => {
     })
 
     return result
-
 }
 
 const getAllFoodsFromDB = async () => {
     const result = await prisma.food.findMany({})
+
+    return result
+
 }
 
 const getSingleFoodFromDB = async (id: string) => {
@@ -30,6 +31,9 @@ const getSingleFoodFromDB = async (id: string) => {
             id
         }
     })
+
+    return result
+
 }
 
 const deleteFoodFromDB = async (id: string) => {
@@ -38,13 +42,30 @@ const deleteFoodFromDB = async (id: string) => {
             id
         }
     })
+
+    if (result.image) {
+        const res = await deleteFile.deleteS3Image(result.image?.split(".com/")[1] as string)
+    }
+
+    return result
+
 }
 
 
 const updateFoodIntoDB = async (id: string, payload: any, image: any) => {
+    const foodImage = image?.location
+    const  findProduct = await prisma.food.findUnique({
+        where: {
+            id
+        }
+    })
 
-    const foodImage = image.filename
-
+  if (findProduct && findProduct?.image) {
+    const result = await deleteFile.deleteS3Image(findProduct?.image?.split(".com/")[1] as string)
+    if (result == false) {
+        throw new ApiError(StatusCodes.BAD_REQUEST, "Something went wrong")
+    }
+  }
     try {
         const result = await prisma.food.update({
             where: {
@@ -55,13 +76,10 @@ const updateFoodIntoDB = async (id: string, payload: any, image: any) => {
                 image: foodImage ?? undefined
             }
         })
-
         return result
     } catch (error) {
         throw new ApiError(StatusCodes.BAD_REQUEST, "Food not found")
     }
-
-
 }
 
 

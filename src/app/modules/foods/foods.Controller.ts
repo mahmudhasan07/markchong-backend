@@ -24,20 +24,20 @@ const getAllFoodController = catchAsync(async (req: Request, res: Response) => {
 })
 
 const getSingleFoodController = catchAsync(async (req: Request, res: Response) => {
-    const id = req.query.id as string
+    const id = req.params.id as string
     const result = await foodService.getSingleFoodFromDB(id)
     sendResponse(res, { statusCode: StatusCodes.OK, success: true, message: "Foods retrieved successfully", data: result })
 })
 
 const deleteFoodController = catchAsync(async (req: Request, res: Response) => {
-    const id = req.query.id as string
+    const id = req.params.id as string
     const result = await foodService.deleteFoodFromDB(id)
     sendResponse(res, { statusCode: StatusCodes.OK, success: true, message: "Foods deleted successfully", data: result })
 })
 
 const updateFoodController = catchAsync(async (req: Request, res: Response) => {
 
-    const id = req.query.id as string
+    const id = req.params.id as string
     const body = req.body as any
     const image = req.file as any
 

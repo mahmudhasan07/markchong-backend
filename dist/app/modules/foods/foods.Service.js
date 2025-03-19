@@ -16,9 +16,9 @@ exports.foodService = void 0;
 const ApiErrors_1 = __importDefault(require("../../error/ApiErrors"));
 const http_status_codes_1 = require("http-status-codes");
 const prisma_1 = require("../../../utils/prisma");
+const deleteFile_1 = require("../../helper/deleteFile");
 const createFoodIntoDB = (payload, image) => __awaiter(void 0, void 0, void 0, function* () {
-    const foodImage = image.location;
-    console.log(foodImage);
+    const foodImage = image === null || image === void 0 ? void 0 : image.location;
     const result = yield prisma_1.prisma.food.create({
         data: Object.assign(Object.assign({}, payload), { image: foodImage })
     });
@@ -26,6 +26,7 @@ const createFoodIntoDB = (payload, image) => __awaiter(void 0, void 0, void 0, f
 });
 const getAllFoodsFromDB = () => __awaiter(void 0, void 0, void 0, function* () {
     const result = yield prisma_1.prisma.food.findMany({});
+    return result;
 });
 const getSingleFoodFromDB = (id) => __awaiter(void 0, void 0, void 0, function* () {
     const result = yield prisma_1.prisma.food.findUnique({
@@ -33,16 +34,34 @@ const getSingleFoodFromDB = (id) => __awaiter(void 0, void 0, void 0, function* 
             id
         }
     });
+    return result;
 });
 const deleteFoodFromDB = (id) => __awaiter(void 0, void 0, void 0, function* () {
+    var _a;
     const result = yield prisma_1.prisma.food.delete({
         where: {
             id
         }
     });
+    if (result.image) {
+        const res = yield deleteFile_1.deleteFile.deleteS3Image((_a = result.image) === null || _a === void 0 ? void 0 : _a.split(".com/")[1]);
+    }
+    return result;
 });
 const updateFoodIntoDB = (id, payload, image) => __awaiter(void 0, void 0, void 0, function* () {
-    const foodImage = image.filename;
+    var _a;
+    const foodImage = image === null || image === void 0 ? void 0 : image.location;
+    const findProduct = yield prisma_1.prisma.food.findUnique({
+        where: {
+            id
+        }
+    });
+    if (findProduct && (findProduct === null || findProduct === void 0 ? void 0 : findProduct.image)) {
+        const result = yield deleteFile_1.deleteFile.deleteS3Image((_a = findProduct === null || findProduct === void 0 ? void 0 : findProduct.image) === null || _a === void 0 ? void 0 : _a.split(".com/")[1]);
+        if (result == false) {
+            throw new ApiErrors_1.default(http_status_codes_1.StatusCodes.BAD_REQUEST, "Something went wrong");
+        }
+    }
     try {
         const result = yield prisma_1.prisma.food.update({
             where: {
