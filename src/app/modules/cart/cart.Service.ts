@@ -16,18 +16,39 @@ const createCartIntoDB = async (payload: any, id: string) => {
         throw new ApiError(StatusCodes.BAD_REQUEST, "Cart already exists")
     }
 
-    const result = await prisma.cart.create({ data: payload })
+    const result = await prisma.cart.create({ data: { ...payload, userId: id } })
     return result
 }
 
 const getMyCartFromDB = async (userId: string) => {
     const result = await prisma.cart.findMany({
-        where : {
-            userId : userId
+        where: {
+            userId: userId
+        },
+        select: {
+            id: true,
+            foodId: true,
+            quantity: true,
+            foodDetails: {
+                select: {
+                    id: true,
+                    name: true,
+                    price: true,
+                    image: true,
+                    day : true
+                }
+            }
         }
     })
+
     return result
 }
 
 
-export const cartService = { createCartIntoDB, getMyCartFromDB }
+const deleteCartFromDB = async (cartId: string, id: string) => {
+    const result = await prisma.cart.delete({ where: { id: cartId, userId: id } })
+    return result
+}
+
+
+export const cartService = { createCartIntoDB, getMyCartFromDB, deleteCartFromDB }

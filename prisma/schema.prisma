@@ -26,6 +26,8 @@ model User {
   updatedAt     DateTime        @updatedAt
   Notifications Notifications[] @relation(name: "Notifications")
   sender        Notifications[] @relation(name: "SenderNotifications")
+  Cart          Cart[]
+  Order         Order[]
 }
 
 model Otp {
@@ -49,6 +51,8 @@ model Food {
   image       String?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+  Cart        Cart[]
+  Items       Items[]
 }
 
 model Location {
@@ -61,22 +65,38 @@ model Location {
 }
 
 model Cart {
-  id        String   @id @default(auto()) @map("_id") @db.ObjectId
-  userId    String   @db.ObjectId
-  foodId    String   @db.ObjectId
-  quantity  Int?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId      String   @db.ObjectId
+  foodId      String   @db.ObjectId
+  quantity    Int      @default(1)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  foodDetails Food     @relation(fields: [foodId], references: [id])
+  User        User     @relation(fields: [userId], references: [id])
 }
 
 model Order {
-  id        String     @id @default(auto()) @map("_id") @db.ObjectId
-  userId    String
-  foodId    String
-  quantity  Int
-  status    FoodStatus @default(PENDING)
-  createdAt DateTime   @default(now())
-  updatedAt DateTime   @updatedAt
+  id          String     @id @default(auto()) @map("_id") @db.ObjectId
+  userId      String     @db.ObjectId
+  totalPrice  Float
+  location    String
+  status      FoodStatus @default(PENDING)
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  Items       Items[]
+  foodId      String?    @db.ObjectId
+  userDetails User       @relation(fields: [userId], references: [id])
+}
+
+model Items {
+  id           String   @id @default(auto()) @map("_id") @db.ObjectId
+  foodId       String   @db.ObjectId
+  orderId      String?   @db.ObjectId
+  quantity     Int
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  foodDetails  Food     @relation(fields: [foodId], references: [id])
+  orderDetails Order?    @relation(fields: [orderId], references: [id])
 }
 
 model Notifications {
