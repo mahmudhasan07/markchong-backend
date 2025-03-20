@@ -3,6 +3,7 @@ import ApiError from "../../error/ApiErrors";
 import { StatusCodes } from "http-status-codes";
 import { prisma } from "../../../utils/prisma";
 import { deleteFile } from "../../helper/deleteFile";
+import { dataAvailableTime } from "../../helper/dataAvailableTime";
 
 const createFoodIntoDB = async (payload: Food, image: any) => {
 
@@ -20,10 +21,20 @@ const createFoodIntoDB = async (payload: Food, image: any) => {
 
 const getAllFoodsFromDB = async () => {
     const result = await prisma.food.findMany({})
-
     return result
+}
+
+const availableFoodsFromDB = async () => {
+
+    if (dataAvailableTime()) {
+        const result = await prisma.food.findMany({})
+        return result
+    }
+
+    throw new ApiError(StatusCodes.BAD_REQUEST, "Foods not available")
 
 }
+
 
 const getSingleFoodFromDB = async (id: string) => {
     const result = await prisma.food.findUnique({
@@ -54,18 +65,18 @@ const deleteFoodFromDB = async (id: string) => {
 
 const updateFoodIntoDB = async (id: string, payload: any, image: any) => {
     const foodImage = image?.location
-    const  findProduct = await prisma.food.findUnique({
+    const findProduct = await prisma.food.findUnique({
         where: {
             id
         }
     })
 
-  if (findProduct && findProduct?.image) {
-    const result = await deleteFile.deleteS3Image(findProduct?.image?.split(".com/")[1] as string)
-    if (result == false) {
-        throw new ApiError(StatusCodes.BAD_REQUEST, "Something went wrong")
+    if (findProduct && findProduct?.image) {
+        const result = await deleteFile.deleteS3Image(findProduct?.image?.split(".com/")[1] as string)
+        if (result == false) {
+            throw new ApiError(StatusCodes.BAD_REQUEST, "Something went wrong")
+        }
     }
-  }
     try {
         const result = await prisma.food.update({
             where: {
@@ -83,4 +94,4 @@ const updateFoodIntoDB = async (id: string, payload: any, image: any) => {
 }
 
 
-export const foodService = { createFoodIntoDB, getAllFoodsFromDB, getSingleFoodFromDB, deleteFoodFromDB, updateFoodIntoDB }
+export const foodService = { createFoodIntoDB, getAllFoodsFromDB, getSingleFoodFromDB, deleteFoodFromDB, updateFoodIntoDB, availableFoodsFromDB }

@@ -8,7 +8,7 @@ import admin from "../../helper/firebaseAdmin";
 // import prisma from "../../utilis/prisma";
 
 // Send notification to a single user
-const sendSingleNotification = async (senderId: string, userId: string, payload: any) => {
+const sendSingleNotification = async (userId: string, payload: any, senderId?: string) => {
   const user = await prisma.user.findUnique({
     where: { id: userId },
   });

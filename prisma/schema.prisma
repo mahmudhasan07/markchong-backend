@@ -101,7 +101,7 @@ model Items {
 
 model Notifications {
   id         String   @id @default(auto()) @map("_id") @db.ObjectId
-  senderId   String   @db.ObjectId
+  senderId   String?   @db.ObjectId
   receiverId String   @db.ObjectId
   title      String
   body       String
@@ -109,7 +109,7 @@ model Notifications {
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
   user       User     @relation(fields: [receiverId], references: [id], name: "Notifications")
-  sender     User     @relation(fields: [senderId], references: [id], name: "SenderNotifications")
+  sender     User?     @relation(fields: [senderId], references: [id], name: "SenderNotifications")
 
   @@map("notifications")
 }

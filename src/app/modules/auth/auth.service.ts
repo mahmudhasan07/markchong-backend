@@ -1,5 +1,5 @@
 import { PrismaClient } from "@prisma/client";
-import { compare } from "bcrypt";
+import { compare, hash } from "bcrypt";
 import { jwtHelpers } from "../../helper/jwtHelper";
 import { Secret } from "jsonwebtoken";
 import ApiError from "../../error/ApiErrors";
@@ -44,7 +44,7 @@ const logInFromDB = async (payload: { email: string, password: string, fcmToken?
 }
 
 
-const verifyOtp = async (payload: { email: string; otp: number }) => {
+const verifyOtp = async (payload: { email: string; otp: number, password: string }) => {
 
     const { message } = await OTPVerify(payload)
 
@@ -54,7 +54,8 @@ const verifyOtp = async (payload: { email: string; otp: number }) => {
                 email: payload.email
             },
             data: {
-                status: "ACTIVE"
+                status: "ACTIVE",
+                password: payload.password ? await hash(payload.password, 10) : undefined
             }
         })
         return updateUserInfo
@@ -73,7 +74,7 @@ const forgetPassword = async (payload: { email: string }) => {
     }
     const token = jwtHelpers.generateToken({ email: findUser.email, id: findUser?.id, role: findUser?.role }, { expiresIn: "1hr" }) as Secret
     OTPFn(findUser.email)
-    return { accessToken: token }
+    return 
 }
 
 export const authService = { logInFromDB, forgetPassword, verifyOtp }

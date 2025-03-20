@@ -23,6 +23,14 @@ const getAllFoodController = catchAsync(async (req: Request, res: Response) => {
     sendResponse(res, { statusCode: StatusCodes.OK, success: true, message: "Foods retrieved successfully", data: result })
 })
 
+
+const availableFoodController = catchAsync(async(req:Request, res:Response)=>{
+
+    const result = await foodService.availableFoodsFromDB()
+
+    sendResponse(res, { statusCode: StatusCodes.OK, success: true, message: "Foods retrieved successfully", data: result })
+})
+
 const getSingleFoodController = catchAsync(async (req: Request, res: Response) => {
     const id = req.params.id as string
     const result = await foodService.getSingleFoodFromDB(id)
@@ -46,4 +54,4 @@ const updateFoodController = catchAsync(async (req: Request, res: Response) => {
     sendResponse(res, { statusCode: StatusCodes.OK, message: "Food updated successfully", success: true, data: result })
 })
 
-export const foodController = { addFoodController, getAllFoodController, getSingleFoodController, deleteFoodController, updateFoodController }
+export const foodController = { addFoodController, getAllFoodController, getSingleFoodController, deleteFoodController, updateFoodController, availableFoodController }
