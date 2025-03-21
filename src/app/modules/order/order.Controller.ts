@@ -31,4 +31,25 @@ const todayOrderController = catchAsync(async (req: Request, res: Response) => {
 
 })
 
-export const orderController = { createOrderController, todayOrderController, myOrderController }
+const exportOrderController = catchAsync(async (req: Request, res: Response) => {
+
+    const result = await orderService.exportOrderFromDB()
+    sendResponse(res, {statusCode : StatusCodes.OK, message : "Orders exported successfully", success : true, data : result})
+
+})
+
+
+const updateOrderController = catchAsync(async (req: Request, res: Response) => {
+    
+    const id = req.params.id
+    const body = req.body
+
+    const result = await orderService.updateOrderFromDB(body, id)
+
+    sendResponse(res, {statusCode : StatusCodes.OK, message : "Order updated successfully", success : true, data : result})
+
+
+})
+
+
+export const orderController = { createOrderController, todayOrderController, myOrderController, exportOrderController, updateOrderController }

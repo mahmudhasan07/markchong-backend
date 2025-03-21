@@ -5,6 +5,7 @@ import { foodRoutes } from "../modules/foods/foods.Routes"
 import { locationRoutes } from "../modules/location/location.Routes"
 import { cartRoutes } from "../modules/cart/cart.Routes"
 import { orderRoutes } from "../modules/order/order.Routes"
+import { NotificationsRouters } from "../modules/notifications/notification.routes"
 
 const router = Router()
 const routes = [
@@ -31,6 +32,10 @@ const routes = [
     {
         path: "/order",
         component: orderRoutes
+    },
+    {
+        path: "/notification",
+        component: NotificationsRouters
     },
 ]
 

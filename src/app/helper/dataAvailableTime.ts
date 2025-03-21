@@ -1,20 +1,15 @@
 import e from "express";
 
-export const dataAvailableTime = () => {
+export const dataAvailableTime = (startday : number, starttime : number, endday : number, endtime : number) => {
     const date = new Date();
 
-    const startTime = 12 * 60
-    const endTime = 8 * 60
-    const startDay = 1
-    const endDay = 4
-
-
-
+    const startTime = starttime * 60
+    const endTime = endtime * 60
+    const startDay = startday 
+    const endDay = endday
 
     const nowDay = date.getDay();
     const nowTime = date.getHours() * 60 + date.getMinutes();
-    
-    // console.log(nowDay);
 
     if (
         (nowDay > startDay && nowDay < endDay) ||  // Covers Tuesday and Wednesday (full days)

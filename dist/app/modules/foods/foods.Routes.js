@@ -17,5 +17,5 @@ route.post('/create', (0, auth_1.default)(client_1.Role.ADMIN), uploadFile_1.fil
 route.get('/', (0, auth_1.default)(), foods_Controller_1.foodController.getAllFoodController);
 route.get(`/:id`, (0, auth_1.default)(), foods_Controller_1.foodController.getSingleFoodController);
 route.delete(`/:id`, (0, auth_1.default)(client_1.Role.ADMIN), foods_Controller_1.foodController.deleteFoodController);
-route.patch(`/:id`, (0, auth_1.default)(client_1.Role.ADMIN), uploadFile_1.fileUploader.uploadFoodImages, parseBodyData_1.parseBodyMiddleware, (0, validateRequest_1.default)(foods_Validation_1.foodValidation.updateFoodValidation), foods_Controller_1.foodController.updateFoodController);
+route.put(`/:id`, (0, auth_1.default)(client_1.Role.ADMIN), uploadFile_1.fileUploader.uploadFoodImages, parseBodyData_1.parseBodyMiddleware, (0, validateRequest_1.default)(foods_Validation_1.foodValidation.updateFoodValidation), foods_Controller_1.foodController.updateFoodController);
 exports.foodRoutes = route;

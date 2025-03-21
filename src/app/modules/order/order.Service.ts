@@ -1,6 +1,9 @@
 import { title } from "process";
 import { prisma } from "../../../utils/prisma"
 import { notificationServices } from "../notifications/notification.service";
+import { dataAvailableTime } from "../../helper/dataAvailableTime";
+import { StatusCodes } from "http-status-codes";
+import ApiError from "../../error/ApiErrors";
 const daysMap = {
     "Sunday": 0, "Monday": 1, "Tuesday": 2, "Wednesday": 3,
     "Thursday": 4, "Friday": 5, "Saturday": 6
@@ -9,6 +12,11 @@ const daysMap = {
 
 
 const createOrderIntoDB = async (payload: any, id: string) => {
+
+    // if (!dataAvailableTime(1, 12, 3, 16)) {
+    //     throw new ApiError(StatusCodes.BAD_REQUEST, "The order period has ended. Please try again on Monday after 12 p.m.")
+    // } 
+
 
     const myCarts = await prisma.cart.findMany({
         where: { userId: id },
@@ -25,18 +33,14 @@ const createOrderIntoDB = async (payload: any, id: string) => {
             Items: {
                 create: myCarts || []
             }
-
-
         },
     })
-
 
     await prisma.cart.deleteMany({
         where: {
             userId: id
         }
     })
-
 
     const body = {
         title: "Order Complete",
@@ -54,6 +58,8 @@ const getMyOrdersFromDB = async (id: string) => {
         where: { userId: id },
         select: {
             id: true,
+            totalPrice: true,
+            status: true,
             Items: {
                 select: {
                     foodDetails: {
@@ -66,7 +72,7 @@ const getMyOrdersFromDB = async (id: string) => {
                     quantity: true
                 }
             },
-            totalPrice: true
+
 
         }
     })
@@ -94,6 +100,8 @@ const adminOrdersFromDB = async () => {
         select: {
             id: true,
             totalPrice: true,
+            location: true,
+            marked: true,
             Items: {
                 select: {
                     foodDetails: {
@@ -122,8 +130,6 @@ const adminOrdersFromDB = async () => {
     return result
 
 
-
-
     // console.log(todayOrders);
 
 
@@ -134,6 +140,31 @@ const adminOrdersFromDB = async () => {
 }
 
 
-export const orderService = { createOrderIntoDB, getMyOrdersFromDB, adminOrdersFromDB }
+const exportOrderFromDB = async () => {
+
+    const result = await prisma.order.findMany({
+        where: {
+            status: "DELIVERED"
+        }
+    })
+    return result
+}
+
+const updateOrderFromDB = async (payload: any, id: string) => {
+
+    const result = await prisma.order.update({
+        where: {
+            id: id
+        },
+        data: {
+            status: payload.status
+        }
+    })
+    return result
+}
+
+
+
+export const orderService = { createOrderIntoDB, getMyOrdersFromDB, adminOrdersFromDB, exportOrderFromDB, updateOrderFromDB }
 
 

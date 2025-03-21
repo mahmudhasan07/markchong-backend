@@ -80,10 +80,11 @@ model Order {
   userId      String     @db.ObjectId
   totalPrice  Float
   location    String
-  status      FoodStatus @default(PENDING)
+  status      FoodStatus @default(PENDING) 
   createdAt   DateTime   @default(now())
   updatedAt   DateTime   @updatedAt
   Items       Items[]
+  marked      Boolean    @default(false)
   foodId      String?    @db.ObjectId
   userDetails User       @relation(fields: [userId], references: [id])
 }
@@ -91,17 +92,17 @@ model Order {
 model Items {
   id           String   @id @default(auto()) @map("_id") @db.ObjectId
   foodId       String   @db.ObjectId
-  orderId      String?   @db.ObjectId
+  orderId      String?  @db.ObjectId
   quantity     Int
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
   foodDetails  Food     @relation(fields: [foodId], references: [id])
-  orderDetails Order?    @relation(fields: [orderId], references: [id])
+  orderDetails Order?   @relation(fields: [orderId], references: [id])
 }
 
 model Notifications {
   id         String   @id @default(auto()) @map("_id") @db.ObjectId
-  senderId   String?   @db.ObjectId
+  senderId   String?  @db.ObjectId
   receiverId String   @db.ObjectId
   title      String
   body       String
@@ -109,7 +110,7 @@ model Notifications {
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
   user       User     @relation(fields: [receiverId], references: [id], name: "Notifications")
-  sender     User?     @relation(fields: [senderId], references: [id], name: "SenderNotifications")
+  sender     User?    @relation(fields: [senderId], references: [id], name: "SenderNotifications")
 
   @@map("notifications")
 }

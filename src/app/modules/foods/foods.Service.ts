@@ -26,7 +26,7 @@ const getAllFoodsFromDB = async () => {
 
 const availableFoodsFromDB = async () => {
 
-    if (dataAvailableTime()) {
+    if (dataAvailableTime(1, 12, 4, 8)) {
         const result = await prisma.food.findMany({})
         return result
     }
