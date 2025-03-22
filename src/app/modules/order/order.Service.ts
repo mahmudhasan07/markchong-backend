@@ -90,7 +90,7 @@ const adminOrdersFromDB = async () => {
 
     //     const nextMonday = new Date(lastMonday);
     // nextMonday.setDate(lastMonday.getDate() + 7); // Moves to next Monday
-
+                                                                                                                             
     const result = await prisma.order.findMany({
         // where: {
         //     createdAt: {

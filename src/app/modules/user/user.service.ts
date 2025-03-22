@@ -5,6 +5,8 @@ import { hash } from "bcrypt"
 import jwt, { JwtPayload } from "jsonwebtoken"
 import { OTPFn } from "../../helper/OTPFn";
 import OTPVerify from "../../helper/OTPVerify";
+import { jwtHelpers } from "../../helper/jwtHelper";
+import { access } from "fs";
 
 const prisma = new PrismaClient();
 
@@ -38,7 +40,12 @@ const createUserIntoDB = async (payload: User) => {
         }
     })
     // OTPFn(payload.email)
-    return result
+
+    const token = jwtHelpers.generateToken({ email: payload.email, id: result.id, role: result.role }, { expiresIn: "24hr" })
+    console.log(token);
+    
+
+    return { result, accessToken: token }
 }
 
 
