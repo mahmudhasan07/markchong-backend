@@ -10,7 +10,7 @@ route.post('/create', auth(Role.USER), orderController.createOrderController)
 
 route.get('/my-order', auth(Role.USER), orderController.myOrderController)
 
-route.get('/', auth(Role.ADMIN), orderController.todayOrderController)
+route.get('/', auth(Role.ADMIN), orderController.adminOrderController)
 
 route.get("/exports", auth(Role.ADMIN), orderController.exportOrderController)
 

@@ -24,19 +24,27 @@ const getAllFoodsFromDB = async () => {
     return result
 }
 
-const availableFoodsFromDB = async () => {
+const availableFoodsFromDB = async (id: string) => {
+
+    const user = await prisma.user.findUnique({
+        where: {
+            id
+        },
+        select: {
+            name: true
+        }
+    })
 
     if (dataAvailableTime(1, 12, 4, 8)) {
         const result = await prisma.food.findMany({})
-        return result
+        return { result, user }
     }
 
-    throw new ApiError(StatusCodes.BAD_REQUEST, "Foods not available")
+   return { result: [], user }
 
 }
 
-
-const getSingleFoodFromDB = async (id: string) => {
+ const getSingleFoodFromDB = async (id: string) => {
     const result = await prisma.food.findUnique({
         where: {
             id

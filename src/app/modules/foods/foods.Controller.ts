@@ -26,7 +26,9 @@ const getAllFoodController = catchAsync(async (req: Request, res: Response) => {
 
 const availableFoodController = catchAsync(async(req:Request, res:Response)=>{
 
-    const result = await foodService.availableFoodsFromDB()
+    const {id} = req.user
+
+    const result = await foodService.availableFoodsFromDB(id)
 
     sendResponse(res, { statusCode: StatusCodes.OK, success: true, message: "Foods retrieved successfully", data: result })
 })

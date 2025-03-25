@@ -4,6 +4,7 @@ import { notificationServices } from "../notifications/notification.service";
 import { dataAvailableTime } from "../../helper/dataAvailableTime";
 import { StatusCodes } from "http-status-codes";
 import ApiError from "../../error/ApiErrors";
+import { FoodStatus } from "@prisma/client";
 const daysMap = {
     "Sunday": 0, "Monday": 1, "Tuesday": 2, "Wednesday": 3,
     "Thursday": 4, "Friday": 5, "Saturday": 6
@@ -79,7 +80,7 @@ const getMyOrdersFromDB = async (id: string) => {
     return result
 }
 
-const adminOrdersFromDB = async () => {
+const adminOrdersFromDB = async (status : FoodStatus) => {
 
     //     const date = new Date()
     //     const day = date.getDay()
@@ -90,18 +91,23 @@ const adminOrdersFromDB = async () => {
 
     //     const nextMonday = new Date(lastMonday);
     // nextMonday.setDate(lastMonday.getDate() + 7); // Moves to next Monday
-                                                                                                                             
+
     const result = await prisma.order.findMany({
-        // where: {
-        //     createdAt: {
-        //         gte: nextMonday // Show orders only if today is next Monday or later
-        //     }
-        // },
+        where: {
+            // createdAt: {
+            //     gte: nextMonday // Show orders only if today is next Monday or later
+            // }
+
+            status : status
+
+        },
         select: {
             id: true,
             totalPrice: true,
             location: true,
             marked: true,
+            status: true,
+            createdAt : true,
             Items: {
                 select: {
                     foodDetails: {
@@ -122,7 +128,8 @@ const adminOrdersFromDB = async () => {
                     name: true,
                     email: true
                 }
-            }
+            },
+          
         }
 
     })

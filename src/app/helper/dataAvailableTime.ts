@@ -1,11 +1,11 @@
-import e from "express";
 
-export const dataAvailableTime = (startday : number, starttime : number, endday : number, endtime : number) => {
+
+export const dataAvailableTime = (startday: number, starttime: number, endday: number, endtime: number) => {
     const date = new Date();
 
     const startTime = starttime * 60
     const endTime = endtime * 60
-    const startDay = startday 
+    const startDay = startday
     const endDay = endday
 
     const nowDay = date.getDay();
