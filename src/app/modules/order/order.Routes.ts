@@ -15,6 +15,7 @@ route.get('/', auth(Role.ADMIN), orderController.adminOrderController)
 route.get("/exports",  orderController.exportOrderController)
 route.get("/location/:id", auth(Role.ADMIN), orderController.getLocationOrderController)
 
+
 route.put(`/update`, auth(Role.ADMIN), orderController.updateOrderController)
 
 export const orderRoutes = route

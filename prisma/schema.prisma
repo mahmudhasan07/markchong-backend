@@ -14,20 +14,23 @@ datasource db {
 }
 
 model User {
-  id            String          @id @default(auto()) @map("_id") @db.ObjectId
-  email         String          @unique
-  name          String?
-  role          Role            @default(USER)
-  status        Status          @default(PENDING)
-  password      String
-  fcmToken      String?
-  image         String?
-  createdAt     DateTime        @default(now())
-  updatedAt     DateTime        @updatedAt
-  Notifications Notifications[] @relation(name: "Notifications")
-  sender        Notifications[] @relation(name: "SenderNotifications")
-  Cart          Cart[]
-  Order         Order[]
+  id               String          @id @default(auto()) @map("_id") @db.ObjectId
+  email            String          @unique
+  name             String?
+  role             Role            @default(USER)
+  status           Status          @default(PENDING)
+  password         String
+  fcmToken         String?
+  image            String?
+  pushNotification Boolean         @default(true)
+  orderReminder    Boolean         @default(true)
+  weaklyUpdate     Boolean         @default(true)
+  createdAt        DateTime        @default(now())
+  updatedAt        DateTime        @updatedAt
+  Notifications    Notifications[] @relation(name: "Notifications")
+  sender           Notifications[] @relation(name: "SenderNotifications")
+  Cart             Cart[]
+  Order            Order[]
 }
 
 model Otp {

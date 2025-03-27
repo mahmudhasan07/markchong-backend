@@ -99,4 +99,22 @@ const updateUserIntoDB = async (id: string, payload: any) => {
 }
 
 
-export const userServices = { createUserIntoDB, passwordChangeIntoDB, updateUserIntoDB }
+const meFromDB = async (id: string) => {
+
+    const user = await prisma.user.findUnique({
+        where: {
+            id: id
+        },
+        select: {
+            pushNotification: true,
+            orderReminder: true,
+            weaklyUpdate: true,
+        }
+    })
+
+    return user
+
+}
+
+
+export const userServices = { createUserIntoDB, passwordChangeIntoDB, updateUserIntoDB, meFromDB }

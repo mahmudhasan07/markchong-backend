@@ -35,7 +35,7 @@ const getMyCartFromDB = async (userId: string) => {
                     name: true,
                     price: true,
                     image: true,
-                    day : true
+                    day: true
                 }
             }
         }
@@ -46,7 +46,9 @@ const getMyCartFromDB = async (userId: string) => {
 
 
 const deleteCartFromDB = async (cartId: string, id: string) => {
+
     const result = await prisma.cart.delete({ where: { id: cartId, userId: id } })
+
     return result
 }
 

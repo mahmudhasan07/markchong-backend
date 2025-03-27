@@ -13,7 +13,7 @@ route.post('/create', validateRequest(UserValidation.createValidation), userCont
 
 route.put('/change-password', userController.passwordChangeController)
 
-route.put("/me", auth(Role.USER || Role.ADMIN),  userController.updateUserController)
+route.put("/me", auth(Role.USER , Role.ADMIN), userController.updateUserController)
 
-
+route.get("/me", auth(Role.USER , Role.ADMIN), userController.meController)
 export const userRoutes = route

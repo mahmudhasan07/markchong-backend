@@ -30,4 +30,8 @@ const forgetPasswordController = catchAsync(async (req: Request, res: Response) 
 })
 
 
+
+
+
+
 export const authController = { logInUserController, forgetPasswordController, verifyOtp }

@@ -24,7 +24,7 @@ const deleteCartController = catchAsync(async (req: Request, res: Response) => {
 
     const cartId = req.params.id
     const { id } = req.user
-
+    
     const result = await cartService.deleteCartFromDB(cartId, id)
     sendResponse(res, { statusCode: StatusCodes.OK, success: true, message: "Cart deleted successfully", data: result })
 

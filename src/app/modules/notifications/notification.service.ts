@@ -18,7 +18,7 @@ const sendSingleNotification = async (userId: string, payload: any, senderId?: s
     data: {
       receiverId: userId,
       senderId: senderId,
-      title: payload.title,
+      title: payload.title, 
       body: payload.body,
     },
   });
@@ -208,8 +208,6 @@ const getNotificationsFromDB = async (req: any) => {
 
   return notifications;
 };
-
-
 
 const getSingleNotificationFromDB = async (
   req: any,
