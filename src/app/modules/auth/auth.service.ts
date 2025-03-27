@@ -74,7 +74,7 @@ const forgetPassword = async (payload: { email: string }) => {
     }
     const token = jwtHelpers.generateToken({ email: findUser.email, id: findUser?.id, role: findUser?.role }, { expiresIn: "1hr" }) as Secret
     OTPFn(findUser.email)
-    return 
+    return
 }
 
 export const authService = { logInFromDB, forgetPassword, verifyOtp }

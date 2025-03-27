@@ -78,9 +78,9 @@ model Cart {
 model Order {
   id          String     @id @default(auto()) @map("_id") @db.ObjectId
   userId      String     @db.ObjectId
-  totalPrice  Float
+  totalPrice  Float?
   location    String
-  status      FoodStatus @default(PENDING) 
+  status      FoodStatus @default(PENDING)
   createdAt   DateTime   @default(now())
   updatedAt   DateTime   @updatedAt
   Items       Items[]

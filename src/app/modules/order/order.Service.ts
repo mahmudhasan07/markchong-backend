@@ -10,7 +10,8 @@ const daysMap = {
     "Thursday": 4, "Friday": 5, "Saturday": 6
 };
 
-
+import fs from "fs";
+import { parse } from "json2csv";
 
 const createOrderIntoDB = async (payload: any, id: string) => {
 
@@ -30,7 +31,7 @@ const createOrderIntoDB = async (payload: any, id: string) => {
     const result = await prisma.order.create({
         data: {
             userId: id,
-            ...payload,
+            location: payload?.location,
             Items: {
                 create: myCarts || []
             }
@@ -80,7 +81,7 @@ const getMyOrdersFromDB = async (id: string) => {
     return result
 }
 
-const adminOrdersFromDB = async (status : FoodStatus) => {
+const adminOrdersFromDB = async (status: FoodStatus) => {
 
     //     const date = new Date()
     //     const day = date.getDay()
@@ -94,11 +95,7 @@ const adminOrdersFromDB = async (status : FoodStatus) => {
 
     const result = await prisma.order.findMany({
         where: {
-            // createdAt: {
-            //     gte: nextMonday // Show orders only if today is next Monday or later
-            // }
-
-            status : status
+            status: status
 
         },
         select: {
@@ -107,7 +104,7 @@ const adminOrdersFromDB = async (status : FoodStatus) => {
             location: true,
             marked: true,
             status: true,
-            createdAt : true,
+            createdAt: true,
             Items: {
                 select: {
                     foodDetails: {
@@ -129,7 +126,7 @@ const adminOrdersFromDB = async (status : FoodStatus) => {
                     email: true
                 }
             },
-          
+
         }
 
     })
@@ -151,17 +148,56 @@ const exportOrderFromDB = async () => {
 
     const result = await prisma.order.findMany({
         where: {
-            status: "DELIVERED"
+            status: "DELIVERED",
+        },
+        select: {
+            userDetails: {
+                select: {
+                    name: true,
+                    email: true
+                }
+            },
+            Items: {
+                select: {
+                    foodDetails: {
+                        select: {
+                            name: true,
+                            price: true,
+                            day: true
+                        }
+                    },
+                    quantity: true
+                }
+            },
+            location: true,
         }
     })
-    return result
+
+    const transformedOrders = result.flatMap(order =>
+        order.Items.map(item => ({
+            name: order.userDetails.name,
+            email: order.userDetails.email,
+            foodName: item.foodDetails.name,
+            price: item.foodDetails.price,
+            quantity: item.quantity,
+            location: order.location,
+            day: item.foodDetails.day
+        }))
+    );
+
+    const csv = parse(transformedOrders);
+
+    return csv
 }
 
-const updateOrderFromDB = async (payload: any, id: string) => {
+const updateOrderFromDB = async (payload: any) => {
 
-    const result = await prisma.order.update({
+
+    const result = await prisma.order.updateMany({
         where: {
-            id: id
+            id: {
+                in: payload.ids
+            }
         },
         data: {
             status: payload.status
@@ -171,7 +207,48 @@ const updateOrderFromDB = async (payload: any, id: string) => {
 }
 
 
+const getLocationOrderFromDB = async (location: string) => {
+    const result = await prisma.order.findMany({
+        where: {
+            location: {
+                contains: location, // Match full or partial location
+                mode: "insensitive" // Ignore case sensitivity
+            }
+        },
+        select: {
+            id: true,
+            totalPrice: true,
+            location: true,
+            marked: true,
+            status: true,
+            createdAt: true,
+            Items: {
+                select: {
+                    foodDetails: {
+                        select: {
+                            day: true,
+                            name: true,
+                            image: true
+                        }
+                    },
+                    quantity: true,
+                    id: true,
+                    orderId: true
 
-export const orderService = { createOrderIntoDB, getMyOrdersFromDB, adminOrdersFromDB, exportOrderFromDB, updateOrderFromDB }
+                }
+            },
+            userDetails: {
+                select: {
+                    name: true,
+                    email: true
+                }
+            },
+        }
+    });
+
+    return result;
+}
+
+export const orderService = { createOrderIntoDB, getMyOrdersFromDB, adminOrdersFromDB, exportOrderFromDB, updateOrderFromDB, getLocationOrderFromDB }
 
 

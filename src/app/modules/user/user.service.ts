@@ -1,7 +1,7 @@
 import { PrismaClient, User } from "@prisma/client";
 import ApiError from "../../error/ApiErrors";
 import { StatusCodes } from "http-status-codes";
-import { hash } from "bcrypt"
+import { compare, hash } from "bcrypt"
 import jwt, { JwtPayload } from "jsonwebtoken"
 import { OTPFn } from "../../helper/OTPFn";
 import OTPVerify from "../../helper/OTPVerify";
@@ -42,8 +42,6 @@ const createUserIntoDB = async (payload: User) => {
     // OTPFn(payload.email)
 
     const token = jwtHelpers.generateToken({ email: payload.email, id: result.id, role: result.role }, { expiresIn: "24hr" })
-    console.log(token);
-    
 
     return { result, accessToken: token }
 }
@@ -62,6 +60,12 @@ const passwordChangeIntoDB = async (payload: any, token: string) => {
         throw new ApiError(StatusCodes.NOT_FOUND, "User is not exists")
     }
 
+    const comparePass = await compare(payload.oldPassword, findUser.password)
+
+    if (!comparePass) {
+        throw new ApiError(StatusCodes.BAD_REQUEST, "Old password is incorrect")
+    }
+
     const newPass = await hash(payload.password, 10)
     const result = await prisma.user.update({
         where: {
@@ -75,9 +79,7 @@ const passwordChangeIntoDB = async (payload: any, token: string) => {
     return result
 }
 
-const updateUserIntoDB = async (id: string, payload: any, image: any) => {
-
-    const userImage = image?.location
+const updateUserIntoDB = async (id: string, payload: any) => {
 
     try {
         const update = await prisma.user.update({
@@ -86,7 +88,6 @@ const updateUserIntoDB = async (id: string, payload: any, image: any) => {
             },
             data: {
                 ...payload,
-                image: userImage ?? undefined
             }
         })
 

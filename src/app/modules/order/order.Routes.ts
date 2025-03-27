@@ -12,8 +12,9 @@ route.get('/my-order', auth(Role.USER), orderController.myOrderController)
 
 route.get('/', auth(Role.ADMIN), orderController.adminOrderController)
 
-route.get("/exports", auth(Role.ADMIN), orderController.exportOrderController)
+route.get("/exports",  orderController.exportOrderController)
+route.get("/location/:id", auth(Role.ADMIN), orderController.getLocationOrderController)
 
-route.put(`/:id`, auth(Role.ADMIN), orderController.updateOrderController)
+route.put(`/update`, auth(Role.ADMIN), orderController.updateOrderController)
 
 export const orderRoutes = route

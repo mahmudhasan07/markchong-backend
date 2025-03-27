@@ -24,8 +24,8 @@ const passwordChangeController = catchAsync(async (req: Request, res: Response) 
 const updateUserController = catchAsync(async (req: Request, res: Response) => {
     const {id} = req.user
     const body = req?.body as any
-    const image = req?.file as any
-    const result = await userServices.updateUserIntoDB(id, body, image)
+   
+    const result = await userServices.updateUserIntoDB(id, body)
     sendResponse(res, { statusCode: StatusCodes.OK, message: "User updated successfully", data: result, success: true })
 })
 

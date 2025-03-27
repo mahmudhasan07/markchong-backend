@@ -34,7 +34,7 @@ const sendSingleNotification = async (userId: string, payload: any, senderId?: s
       body: payload.body,
     },
     token: user.fcmToken,
-  }; 
+  };
 
 
 

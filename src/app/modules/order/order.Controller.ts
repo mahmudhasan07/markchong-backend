@@ -34,29 +34,44 @@ const adminOrderController = catchAsync(async (req: Request, res: Response) => {
     const { data, limit, page, total, totalPage } = await paginationSystem(result, req)
 
 
-    sendResponse(res, { statusCode: StatusCodes.OK, success: true, message: "Orders retrieved successfully", data: data, meta: {limit, page, total, totalPage} })
+    sendResponse(res, { statusCode: StatusCodes.OK, success: true, message: "Orders retrieved successfully", data: data, meta: { limit, page, total, totalPage } })
 
 })
 
 const exportOrderController = catchAsync(async (req: Request, res: Response) => {
 
     const result = await orderService.exportOrderFromDB()
-    sendResponse(res, { statusCode: StatusCodes.OK, message: "Orders exported successfully", success: true, data: result })
+
+    res.setHeader("Content-Type", "text/csv");
+    res.setHeader("Content-Disposition", 'attachment; filename="orders.csv"');
+
+    // Send CSV data
+    // res.download(result);
+    res.send(result);
+    // sendResponse(res, { statusCode: StatusCodes.OK, message: "Orders exported successfully", success: true })
 
 })
 
 
 const updateOrderController = catchAsync(async (req: Request, res: Response) => {
 
-    const id = req.params.id
     const body = req.body
-
-    const result = await orderService.updateOrderFromDB(body, id)
-
+    const result = await orderService.updateOrderFromDB(body)
     sendResponse(res, { statusCode: StatusCodes.OK, message: "Order updated successfully", success: true, data: result })
-
 
 })
 
 
-export const orderController = { createOrderController, adminOrderController, myOrderController, exportOrderController, updateOrderController }
+const getLocationOrderController = catchAsync(async (req: Request, res: Response) => {
+
+    const location = req.params.id
+    console.log(location);
+
+    const result = await orderService.getLocationOrderFromDB(location)
+
+    sendResponse(res, { statusCode: StatusCodes.OK, message: "Orders retrieved successfully", success: true, data: result })
+
+})
+
+
+export const orderController = { createOrderController, adminOrderController, myOrderController, exportOrderController, updateOrderController, getLocationOrderController }
