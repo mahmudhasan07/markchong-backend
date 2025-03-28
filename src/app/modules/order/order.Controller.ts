@@ -65,7 +65,6 @@ const updateOrderController = catchAsync(async (req: Request, res: Response) => 
 const getLocationOrderController = catchAsync(async (req: Request, res: Response) => {
 
     const location = req.params.id
-    console.log(location);
 
     const result = await orderService.getLocationOrderFromDB(location)
 

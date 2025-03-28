@@ -12,6 +12,7 @@ const daysMap = {
 
 import fs from "fs";
 import { parse } from "json2csv";
+import { log } from "console";
 
 const createOrderIntoDB = async (payload: any, id: string) => {
 
@@ -19,65 +20,115 @@ const createOrderIntoDB = async (payload: any, id: string) => {
     //     throw new ApiError(StatusCodes.BAD_REQUEST, "The order period has ended. Please try again on Monday after 12 p.m.")
     // } 
 
+    // console.log(payload, "payload");
+    // console.log(id, "id");
 
-    const myCarts = await prisma.cart.findMany({
-        where: { userId: id },
-        select: {
-            foodId: true,
-            quantity: true
-        }
-    })
-    console.log(myCarts);
-    const result = await prisma.order.create({
-        data: {
-            userId: id,
-            location: payload?.location,
-            Items: {
-                create: myCarts || []
+    const result = await prisma.$transaction(async (prisma) => {
+        // Fetch cart items
+        const myCarts = await prisma.cart.findMany({
+            where: { userId: id },
+            select: {
+                foodId: true,
+                quantity: true,
+                foodDetails: {
+                    select: {
+                        price: true,
+                    }
+                }
             }
-        },
-    })
+        });
 
-    await prisma.cart.deleteMany({
-        where: {
-            userId: id
-        }
-    })
-
-    const body = {
-        title: "Order Complete",
-        body: "Your order has been confirmed"
-    }
-
-    await notificationServices.sendSingleNotification(id, body)
+        const totalPrice = myCarts.reduce((acc, item) => {
+            const price = item.foodDetails?.price || 0; // Default to 0 if price is undefined
+            return acc + price * item.quantity;
+        }, 0);
 
 
-    return result
+        // Create order
+        const order = await prisma.order.create({
+            data: {
+                userId: id,
+                location: payload.location,
+                totalPrice: payload.totalPrice == totalPrice ? payload.totalPrice : totalPrice,
+                Items: {
+                    create: myCarts.map(({ foodId, quantity }) => ({ foodId, quantity })) || []
+                }
+            },
+        });
+
+        // Delete cart items
+        await prisma.cart.deleteMany({
+            where: {
+                userId: id
+            }
+        });
+
+        // Send notification
+        const body = {
+            title: "Order Complete",
+            body: "Your order has been confirmed"
+        };
+        await notificationServices.sendSingleNotification(id, body);
+
+        return order;
+    });
+
+    console.log(result);
+    return result;
 }
 
 const getMyOrdersFromDB = async (id: string) => {
-    const result = await prisma.order.findMany({
-        where: { userId: id },
-        select: {
-            id: true,
-            totalPrice: true,
-            status: true,
-            Items: {
-                select: {
-                    foodDetails: {
-                        select: {
-                            name: true,
-                            image: true,
-                            price: true
-                        }
-                    },
-                    quantity: true
+    // const result = await prisma.order.findMany({
+    //     where: { userId: id },
+    //     select: {
+    //         Items: {
+    //             select: {
+    //                 foodDetails: {
+    //                     select: {
+    //                         name: true,
+    //                         image: true,
+    //                         price: true
+    //                     }
+    //                 },
+    //                 quantity: true
+    //             }
+    //         },
+    //     }
+    // })
+    const result = await prisma.items.findMany({
+        where: {
+           orderDetails : {
+            userId : id
+           }
+        },
+        select : {
+            foodDetails : {
+                select : {
+                    name : true,
+                    image : true,
+                    price : true,
+                    day : true
                 }
             },
-
-
-        }
+            quantity : true,
+            orderId : true,
+            id : true,
+            orderDetails : {
+              
+                select : {
+                    totalPrice : true,
+                    location : true,
+                    status : true,
+                    id : true,
+                    createdAt : true,
+                    userId : true,
+                }
+            }
+        },
+      
     })
+
+
     return result
 }
 

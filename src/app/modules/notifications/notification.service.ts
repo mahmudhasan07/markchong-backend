@@ -18,7 +18,7 @@ const sendSingleNotification = async (userId: string, payload: any, senderId?: s
     data: {
       receiverId: userId,
       senderId: senderId,
-      title: payload.title, 
+      title: payload.title,
       body: payload.body,
     },
   });
@@ -56,7 +56,7 @@ const sendSingleNotification = async (userId: string, payload: any, senderId?: s
 const sendNotifications = async (senderId: string, req: any) => {
   const users = await prisma.user.findMany({
     where: {
-      fcmToken: {},
+      fcmToken: { not: null }, // Ensure fcmToken is not null
     },
     select: {
       id: true,
@@ -99,7 +99,7 @@ const sendNotifications = async (senderId: string, req: any) => {
   // Save notifications only if there is data
   if (notificationData.length > 0) {
     await prisma.notifications.createMany({
-      data: notificationData,
+      data: notificationData, 
     });
   }
 

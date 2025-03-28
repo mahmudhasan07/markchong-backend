@@ -20,7 +20,7 @@ model User {
   role             Role            @default(USER)
   status           Status          @default(PENDING)
   password         String
-  fcmToken         String?
+  fcmToken         String? 
   image            String?
   pushNotification Boolean         @default(true)
   orderReminder    Boolean         @default(true)

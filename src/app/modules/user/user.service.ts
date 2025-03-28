@@ -106,6 +106,9 @@ const meFromDB = async (id: string) => {
             id: id
         },
         select: {
+            id : true,
+            name: true,
+            email: true,
             pushNotification: true,
             orderReminder: true,
             weaklyUpdate: true,
