@@ -22,9 +22,17 @@ const firebaseAdmin_1 = __importDefault(require("../../helper/firebaseAdmin"));
 // import { IPaginationOptions } from "../../interface/pagination.type";
 // import prisma from "../../utilis/prisma";
 // Send notification to a single user
-const sendSingleNotification = (senderId, userId, payload) => __awaiter(void 0, void 0, void 0, function* () {
+const sendSingleNotification = (userId, payload, senderId) => __awaiter(void 0, void 0, void 0, function* () {
     const user = yield prisma_1.prisma.user.findUnique({
         where: { id: userId },
+    });
+    yield prisma_1.prisma.notifications.create({
+        data: {
+            receiverId: userId,
+            senderId: senderId,
+            title: payload.title,
+            body: payload.body,
+        },
     });
     if (!(user === null || user === void 0 ? void 0 : user.fcmToken)) {
         throw new ApiErrors_1.default(404, "User not found with FCM token");
@@ -36,14 +44,6 @@ const sendSingleNotification = (senderId, userId, payload) => __awaiter(void 0, 
         },
         token: user.fcmToken,
     };
-    yield prisma_1.prisma.notifications.create({
-        data: {
-            receiverId: userId,
-            senderId: senderId,
-            title: payload.title,
-            body: payload.body,
-        },
-    });
     try {
         const response = yield firebaseAdmin_1.default.messaging().send(message);
         return response;
@@ -64,7 +64,7 @@ const sendSingleNotification = (senderId, userId, payload) => __awaiter(void 0, 
 const sendNotifications = (senderId, req) => __awaiter(void 0, void 0, void 0, function* () {
     const users = yield prisma_1.prisma.user.findMany({
         where: {
-            fcmToken: {},
+            fcmToken: { not: null }, // Ensure fcmToken is not null
         },
         select: {
             id: true,

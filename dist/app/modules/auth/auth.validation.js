@@ -27,15 +27,18 @@ const forgotPassword = zod_1.default.object({
     }),
 });
 const verifyOtp = zod_1.default.object({
-    // email: z
-    //     .string({
-    //         required_error: "Email is required!",
-    //     })
-    //     .email({
-    //         message: "Invalid email format!",
-    //     }),
+    email: zod_1.default
+        .string({
+        required_error: "Email is required!",
+    })
+        .email({
+        message: "Invalid email format!",
+    }),
     otp: zod_1.default.number({
         required_error: "OTP is required!",
+    }),
+    password: zod_1.default.string({
+        required_error: "New password is required!",
     }),
 });
 const changePassword = zod_1.default.object({

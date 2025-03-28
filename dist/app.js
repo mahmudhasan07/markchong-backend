@@ -23,8 +23,33 @@ const http_status_codes_1 = require("http-status-codes");
 const PrismaConnection_1 = require("./app/DB/PrismaConnection");
 const path_1 = __importDefault(require("path"));
 const fs_1 = __importDefault(require("fs"));
+const node_cron_1 = __importDefault(require("node-cron"));
+const notification_service_1 = require("./app/modules/notifications/notification.service");
+const prisma_1 = require("./utils/prisma");
 exports.myCache = new node_cache_1.default({ stdTTL: 300 });
 const app = (0, express_1.default)();
+node_cron_1.default.schedule('0 12 * * 1', () => __awaiter(void 0, void 0, void 0, function* () {
+    console.log('Sending notifications to all users...');
+    const admin = yield prisma_1.prisma.user.findFirst({
+        where: { role: "ADMIN" },
+    });
+    const body = {
+        title: "Weekly Notification",
+        body: "New Items are available for order!",
+    };
+    try {
+        if (admin === null || admin === void 0 ? void 0 : admin.id) {
+            yield notification_service_1.notificationServices.sendNotifications(admin.id, body);
+        }
+        else {
+            console.error('Admin ID is undefined. Notifications not sent.');
+        }
+        // await sendNotification(); // Call the function to send notifications
+    }
+    catch (error) {
+        console.error('Error sending notifications:', error);
+    }
+}));
 exports.corsOptions = {
     origin: [
         "http://localhost:3000",

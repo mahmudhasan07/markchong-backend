@@ -15,6 +15,7 @@ const parseBodyData_1 = require("../../middleware/parseBodyData");
 const route = (0, express_1.Router)();
 route.post('/create', (0, auth_1.default)(client_1.Role.ADMIN), uploadFile_1.fileUploader.uploadFoodImages, parseBodyData_1.parseBodyMiddleware, (0, validateRequest_1.default)(foods_Validation_1.foodValidation.addFoodValidation), foods_Controller_1.foodController.addFoodController);
 route.get('/', (0, auth_1.default)(), foods_Controller_1.foodController.getAllFoodController);
+route.get("/available", (0, auth_1.default)(), foods_Controller_1.foodController.availableFoodController);
 route.get(`/:id`, (0, auth_1.default)(), foods_Controller_1.foodController.getSingleFoodController);
 route.delete(`/:id`, (0, auth_1.default)(client_1.Role.ADMIN), foods_Controller_1.foodController.deleteFoodController);
 route.put(`/:id`, (0, auth_1.default)(client_1.Role.ADMIN), uploadFile_1.fileUploader.uploadFoodImages, parseBodyData_1.parseBodyMiddleware, (0, validateRequest_1.default)(foods_Validation_1.foodValidation.updateFoodValidation), foods_Controller_1.foodController.updateFoodController);

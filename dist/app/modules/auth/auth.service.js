@@ -71,7 +71,8 @@ const verifyOtp = (payload) => __awaiter(void 0, void 0, void 0, function* () {
                 email: payload.email
             },
             data: {
-                status: "ACTIVE"
+                status: "ACTIVE",
+                password: payload.password ? yield (0, bcrypt_1.hash)(payload.password, 10) : undefined
             }
         });
         return updateUserInfo;
@@ -88,6 +89,6 @@ const forgetPassword = (payload) => __awaiter(void 0, void 0, void 0, function* 
     }
     const token = jwtHelper_1.jwtHelpers.generateToken({ email: findUser.email, id: findUser === null || findUser === void 0 ? void 0 : findUser.id, role: findUser === null || findUser === void 0 ? void 0 : findUser.role }, { expiresIn: "1hr" });
     (0, OTPFn_1.OTPFn)(findUser.email);
-    return { accessToken: token };
+    return;
 });
 exports.authService = { logInFromDB, forgetPassword, verifyOtp };

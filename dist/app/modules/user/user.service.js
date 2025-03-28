@@ -18,6 +18,7 @@ const ApiErrors_1 = __importDefault(require("../../error/ApiErrors"));
 const http_status_codes_1 = require("http-status-codes");
 const bcrypt_1 = require("bcrypt");
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
+const jwtHelper_1 = require("../../helper/jwtHelper");
 const prisma = new client_1.PrismaClient();
 const createUserIntoDB = (payload) => __awaiter(void 0, void 0, void 0, function* () {
     const findUser = yield prisma.user.findUnique({
@@ -42,7 +43,8 @@ const createUserIntoDB = (payload) => __awaiter(void 0, void 0, void 0, function
         }
     });
     // OTPFn(payload.email)
-    return result;
+    const token = jwtHelper_1.jwtHelpers.generateToken({ email: payload.email, id: result.id, role: result.role }, { expiresIn: "24hr" });
+    return { result, accessToken: token };
 });
 const passwordChangeIntoDB = (payload, token) => __awaiter(void 0, void 0, void 0, function* () {
     const userInfo = token && jsonwebtoken_1.default.decode(token);
@@ -53,6 +55,10 @@ const passwordChangeIntoDB = (payload, token) => __awaiter(void 0, void 0, void 
     });
     if (!findUser) {
         throw new ApiErrors_1.default(http_status_codes_1.StatusCodes.NOT_FOUND, "User is not exists");
+    }
+    const comparePass = yield (0, bcrypt_1.compare)(payload.oldPassword, findUser.password);
+    if (!comparePass) {
+        throw new ApiErrors_1.default(http_status_codes_1.StatusCodes.BAD_REQUEST, "Old password is incorrect");
     }
     const newPass = yield (0, bcrypt_1.hash)(payload.password, 10);
     const result = yield prisma.user.update({
@@ -65,14 +71,13 @@ const passwordChangeIntoDB = (payload, token) => __awaiter(void 0, void 0, void 
     });
     return result;
 });
-const updateUserIntoDB = (id, payload, image) => __awaiter(void 0, void 0, void 0, function* () {
-    const userImage = image === null || image === void 0 ? void 0 : image.location;
+const updateUserIntoDB = (id, payload) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const update = yield prisma.user.update({
             where: {
                 id
             },
-            data: Object.assign(Object.assign({}, payload), { image: userImage !== null && userImage !== void 0 ? userImage : undefined })
+            data: Object.assign({}, payload)
         });
         return update;
     }
@@ -80,4 +85,20 @@ const updateUserIntoDB = (id, payload, image) => __awaiter(void 0, void 0, void 
         throw new ApiErrors_1.default(http_status_codes_1.StatusCodes.BAD_REQUEST, "User not found");
     }
 });
-exports.userServices = { createUserIntoDB, passwordChangeIntoDB, updateUserIntoDB };
+const meFromDB = (id) => __awaiter(void 0, void 0, void 0, function* () {
+    const user = yield prisma.user.findUnique({
+        where: {
+            id: id
+        },
+        select: {
+            id: true,
+            name: true,
+            email: true,
+            pushNotification: true,
+            orderReminder: true,
+            weaklyUpdate: true,
+        }
+    });
+    return user;
+});
+exports.userServices = { createUserIntoDB, passwordChangeIntoDB, updateUserIntoDB, meFromDB };

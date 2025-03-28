@@ -18,17 +18,16 @@ const catchAsync_1 = __importDefault(require("../../../shared/catchAsync"));
 const sendResponse_1 = __importDefault(require("../../middleware/sendResponse"));
 const http_status_codes_1 = require("http-status-codes");
 const auth_service_1 = require("./auth.service");
-const jsonwebtoken_1 = require("jsonwebtoken");
 const logInUserController = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const result = yield auth_service_1.authService.logInFromDB(req.body);
     (0, sendResponse_1.default)(res, { statusCode: http_status_codes_1.StatusCodes.OK, success: true, message: "User login successfully", data: result });
 }));
 const verifyOtp = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const body = req.body;
-    const token = req.headers.authorization;
-    const { email } = (0, jsonwebtoken_1.decode)(token);
-    const payload = Object.assign(Object.assign({}, body), { email });
-    const result = yield auth_service_1.authService.verifyOtp(payload);
+    // const token = req.headers.authorization as string
+    // const {email} = decode(token) as any
+    // const payload = {...body,email}
+    const result = yield auth_service_1.authService.verifyOtp(body);
     (0, sendResponse_1.default)(res, { statusCode: http_status_codes_1.StatusCodes.OK, success: true, message: "OTP verified successfully", data: result });
 }));
 const forgetPasswordController = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {

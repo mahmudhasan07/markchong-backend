@@ -30,8 +30,12 @@ const passwordChangeController = (0, catchAsync_1.default)((req, res) => __await
 const updateUserController = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { id } = req.user;
     const body = req === null || req === void 0 ? void 0 : req.body;
-    const image = req === null || req === void 0 ? void 0 : req.file;
-    const result = yield user_service_1.userServices.updateUserIntoDB(id, body, image);
+    const result = yield user_service_1.userServices.updateUserIntoDB(id, body);
     (0, sendResponse_1.default)(res, { statusCode: http_status_codes_1.StatusCodes.OK, message: "User updated successfully", data: result, success: true });
 }));
-exports.userController = { createUserController, passwordChangeController, updateUserController };
+const meController = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { id } = req.user;
+    const result = yield user_service_1.userServices.meFromDB(id);
+    (0, sendResponse_1.default)(res, { statusCode: http_status_codes_1.StatusCodes.OK, message: "User retrieved successfully", data: result, success: true });
+}));
+exports.userController = { createUserController, passwordChangeController, updateUserController, meController };

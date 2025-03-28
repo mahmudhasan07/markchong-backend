@@ -26,15 +26,33 @@ const createCartIntoDB = (payload, id) => __awaiter(void 0, void 0, void 0, func
     if (findCart) {
         throw new ApiErrors_1.default(http_status_codes_1.StatusCodes.BAD_REQUEST, "Cart already exists");
     }
-    const result = yield prisma_1.prisma.cart.create({ data: payload });
+    const result = yield prisma_1.prisma.cart.create({ data: Object.assign(Object.assign({}, payload), { userId: id }) });
     return result;
 });
 const getMyCartFromDB = (userId) => __awaiter(void 0, void 0, void 0, function* () {
     const result = yield prisma_1.prisma.cart.findMany({
         where: {
             userId: userId
+        },
+        select: {
+            id: true,
+            foodId: true,
+            quantity: true,
+            foodDetails: {
+                select: {
+                    id: true,
+                    name: true,
+                    price: true,
+                    image: true,
+                    day: true
+                }
+            }
         }
     });
     return result;
 });
-exports.cartService = { createCartIntoDB, getMyCartFromDB };
+const deleteCartFromDB = (cartId, id) => __awaiter(void 0, void 0, void 0, function* () {
+    const result = yield prisma_1.prisma.cart.delete({ where: { id: cartId, userId: id } });
+    return result;
+});
+exports.cartService = { createCartIntoDB, getMyCartFromDB, deleteCartFromDB };

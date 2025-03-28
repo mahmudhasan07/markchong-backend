@@ -27,6 +27,11 @@ const getAllFoodController = (0, catchAsync_1.default)((req, res) => __awaiter(v
     const result = yield foods_Service_1.foodService.getAllFoodsFromDB();
     (0, sendResponse_1.default)(res, { statusCode: http_status_codes_1.StatusCodes.OK, success: true, message: "Foods retrieved successfully", data: result });
 }));
+const availableFoodController = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { id } = req.user;
+    const result = yield foods_Service_1.foodService.availableFoodsFromDB(id);
+    (0, sendResponse_1.default)(res, { statusCode: http_status_codes_1.StatusCodes.OK, success: true, message: "Foods retrieved successfully", data: result });
+}));
 const getSingleFoodController = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const id = req.params.id;
     const result = yield foods_Service_1.foodService.getSingleFoodFromDB(id);
@@ -44,4 +49,4 @@ const updateFoodController = (0, catchAsync_1.default)((req, res) => __awaiter(v
     const result = yield foods_Service_1.foodService.updateFoodIntoDB(id, body, image);
     (0, sendResponse_1.default)(res, { statusCode: http_status_codes_1.StatusCodes.OK, message: "Food updated successfully", success: true, data: result });
 }));
-exports.foodController = { addFoodController, getAllFoodController, getSingleFoodController, deleteFoodController, updateFoodController };
+exports.foodController = { addFoodController, getAllFoodController, getSingleFoodController, deleteFoodController, updateFoodController, availableFoodController };

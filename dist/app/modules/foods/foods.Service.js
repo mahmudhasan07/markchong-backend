@@ -17,6 +17,7 @@ const ApiErrors_1 = __importDefault(require("../../error/ApiErrors"));
 const http_status_codes_1 = require("http-status-codes");
 const prisma_1 = require("../../../utils/prisma");
 const deleteFile_1 = require("../../helper/deleteFile");
+const dataAvailableTime_1 = require("../../helper/dataAvailableTime");
 const createFoodIntoDB = (payload, image) => __awaiter(void 0, void 0, void 0, function* () {
     const foodImage = image === null || image === void 0 ? void 0 : image.location;
     const result = yield prisma_1.prisma.food.create({
@@ -27,6 +28,21 @@ const createFoodIntoDB = (payload, image) => __awaiter(void 0, void 0, void 0, f
 const getAllFoodsFromDB = () => __awaiter(void 0, void 0, void 0, function* () {
     const result = yield prisma_1.prisma.food.findMany({});
     return result;
+});
+const availableFoodsFromDB = (id) => __awaiter(void 0, void 0, void 0, function* () {
+    const user = yield prisma_1.prisma.user.findUnique({
+        where: {
+            id
+        },
+        select: {
+            name: true
+        }
+    });
+    if ((0, dataAvailableTime_1.dataAvailableTime)(1, 12, 6, 8)) {
+        const result = yield prisma_1.prisma.food.findMany({});
+        return { result, user };
+    }
+    return { result: [], user };
 });
 const getSingleFoodFromDB = (id) => __awaiter(void 0, void 0, void 0, function* () {
     const result = yield prisma_1.prisma.food.findUnique({
@@ -75,4 +91,4 @@ const updateFoodIntoDB = (id, payload, image) => __awaiter(void 0, void 0, void 
         throw new ApiErrors_1.default(http_status_codes_1.StatusCodes.BAD_REQUEST, "Food not found");
     }
 });
-exports.foodService = { createFoodIntoDB, getAllFoodsFromDB, getSingleFoodFromDB, deleteFoodFromDB, updateFoodIntoDB };
+exports.foodService = { createFoodIntoDB, getAllFoodsFromDB, getSingleFoodFromDB, deleteFoodFromDB, updateFoodIntoDB, availableFoodsFromDB };
