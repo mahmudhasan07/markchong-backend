@@ -38,7 +38,7 @@ const availableFoodsFromDB = (id) => __awaiter(void 0, void 0, void 0, function*
             name: true
         }
     });
-    if ((0, dataAvailableTime_1.dataAvailableTime)(1, 12, 6, 8)) {
+    if ((0, dataAvailableTime_1.dataAvailableTime)(1, 12, 4, 8)) {
         const result = yield prisma_1.prisma.food.findMany({});
         return { result, user };
     }

@@ -8,19 +8,25 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.orderService = void 0;
 const prisma_1 = require("../../../utils/prisma");
 const notification_service_1 = require("../notifications/notification.service");
+const dataAvailableTime_1 = require("../../helper/dataAvailableTime");
+const http_status_codes_1 = require("http-status-codes");
+const ApiErrors_1 = __importDefault(require("../../error/ApiErrors"));
 const daysMap = {
     "Sunday": 0, "Monday": 1, "Tuesday": 2, "Wednesday": 3,
     "Thursday": 4, "Friday": 5, "Saturday": 6
 };
 const json2csv_1 = require("json2csv");
 const createOrderIntoDB = (payload, id) => __awaiter(void 0, void 0, void 0, function* () {
-    // if (!dataAvailableTime(1, 12, 3, 16)) {
-    //     throw new ApiError(StatusCodes.BAD_REQUEST, "The order period has ended. Please try again on Monday after 12 p.m.")
-    // } 
+    if (!(0, dataAvailableTime_1.dataAvailableTime)(1, 12, 3, 16)) {
+        throw new ApiErrors_1.default(http_status_codes_1.StatusCodes.BAD_REQUEST, "The order period has ended. Please try again on Monday after 12 p.m.");
+    }
     // console.log(payload, "payload");
     // console.log(id, "id");
     const result = yield prisma_1.prisma.$transaction((prisma) => __awaiter(void 0, void 0, void 0, function* () {

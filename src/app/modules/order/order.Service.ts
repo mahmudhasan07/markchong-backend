@@ -16,9 +16,9 @@ import { log } from "console";
 
 const createOrderIntoDB = async (payload: any, id: string) => {
 
-    // if (!dataAvailableTime(1, 12, 3, 16)) {
-    //     throw new ApiError(StatusCodes.BAD_REQUEST, "The order period has ended. Please try again on Monday after 12 p.m.")
-    // } 
+    if (!dataAvailableTime(1, 12, 3, 16)) {
+        throw new ApiError(StatusCodes.BAD_REQUEST, "The order period has ended. Please try again on Monday after 12 p.m.")
+    }
 
     // console.log(payload, "payload");
     // console.log(id, "id");
@@ -97,35 +97,35 @@ const getMyOrdersFromDB = async (id: string) => {
     // })
     const result = await prisma.items.findMany({
         where: {
-           orderDetails : {
-            userId : id
-           }
+            orderDetails: {
+                userId: id
+            }
         },
-        select : {
-            foodDetails : {
-                select : {
-                    name : true,
-                    image : true,
-                    price : true,
-                    day : true
+        select: {
+            foodDetails: {
+                select: {
+                    name: true,
+                    image: true,
+                    price: true,
+                    day: true
                 }
             },
-            quantity : true,
-            orderId : true,
-            id : true,
-            orderDetails : {
-              
-                select : {
-                    totalPrice : true,
-                    location : true,
-                    status : true,
-                    id : true,
-                    createdAt : true,
-                    userId : true,
+            quantity: true,
+            orderId: true,
+            id: true,
+            orderDetails: {
+
+                select: {
+                    totalPrice: true,
+                    location: true,
+                    status: true,
+                    id: true,
+                    createdAt: true,
+                    userId: true,
                 }
             }
         },
-      
+
     })
 
 
