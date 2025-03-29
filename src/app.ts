@@ -19,7 +19,7 @@ const app = express();
 
 cron.schedule('0 12 * * 1', async () => {
     console.log('Sending notifications to all users...');
-    const admin =  await prisma.user.findFirst({
+    const admin = await prisma.user.findFirst({
         where: { role: "ADMIN" },
     })
     const body = {
@@ -29,6 +29,8 @@ cron.schedule('0 12 * * 1', async () => {
     try {
         if (admin?.id) {
             await notificationServices.sendNotifications(admin.id, body);
+            console.log('Notifications sent successfully!');
+            
         } else {
             console.error('Admin ID is undefined. Notifications not sent.');
         }

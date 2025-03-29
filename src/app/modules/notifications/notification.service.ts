@@ -53,10 +53,10 @@ const sendSingleNotification = async (userId: string, payload: any, senderId?: s
 };
 
 // Send notifications to all users with valid FCM tokens
-const sendNotifications = async (senderId: string, req: any) => {
+const sendNotifications = async (senderId: string, body: any) => {
   const users = await prisma.user.findMany({
     where: {
-      fcmToken: { not: null }, // Ensure fcmToken is not null
+      fcmToken: { }, // Ensure fcmToken is not null
     },
     select: {
       id: true,
@@ -72,8 +72,8 @@ const sendNotifications = async (senderId: string, req: any) => {
 
   const message = {
     notification: {
-      title: req.body.title,
-      body: req.body.body,
+      title: body.title,
+      body: body.body,
     },
     tokens: fcmTokens,
   };
@@ -92,8 +92,8 @@ const sendNotifications = async (senderId: string, req: any) => {
   const notificationData = successfulUsers.map((user) => ({
     senderId: senderId,
     receiverId: user.id,
-    title: req.body.title,
-    body: req.body.body,
+    title: body.title,
+    body: body.body,
   }));
 
   // Save notifications only if there is data
